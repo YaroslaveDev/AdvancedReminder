@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.pfv.advancedreminder.ui.navigation.routes.Screens
+import com.pfv.advancedreminder.ui.screens.home.HomeScreen
 import com.pfv.advancedreminder.ui.screens.splash_screen.SplashScreen
 
 @Composable
@@ -24,7 +25,7 @@ fun MainNavGraph(
 
         composable<Screens.Home> {
 
-
+            HomeScreen(navController = navController)
         }
 
         composable<Screens.AddNewReminder> {
