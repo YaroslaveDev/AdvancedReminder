@@ -36,8 +36,11 @@ import androidx.navigation.NavController
 import com.pfv.advancedreminder.R
 import com.pfv.advancedreminder.ext.date.toFormattedString
 import com.pfv.advancedreminder.ext.numbers.ifNegativeSetZero
+import com.pfv.advancedreminder.ui.navigation.routes.Screens
 import com.pfv.advancedreminder.ui.screens.home.components.DateItem
 import com.pfv.advancedreminder.ui.screens.home.components.InfoBoardItem
+import com.pfv.advancedreminder.ui.screens.home.event.HomeScreenEvent
+import com.pfv.advancedreminder.ui.screens.home.nav_state.HomeScreenNavState
 import java.util.Calendar
 
 @Composable
@@ -62,7 +65,7 @@ fun HomeScreen(
         viewModel.dates.size
     }
 
-    LaunchedEffect(currentDate){
+    LaunchedEffect(currentDate) {
         currentDate = Calendar.getInstance().time
     }
 
@@ -80,7 +83,7 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
 
         lazyState.animateScrollToItem(
             centerPosition
@@ -93,7 +96,10 @@ fun HomeScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { })
+                onClick = {
+                    viewModel.reduceEvent(HomeScreenEvent.NavToAddNewReminderScreen)
+                }
+            )
             {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_add),
@@ -175,6 +181,19 @@ fun HomeScreen(
                     isActiveItem = it == pagerState.currentPage,
                     date = itemDate
                 )
+            }
+        }
+    }
+
+    LaunchedEffect(viewModel.navState) {
+
+        when (viewModel.navState) {
+            HomeScreenNavState.InitState -> {}
+            HomeScreenNavState.NavToAddNewReminderScreen -> {
+                navController.navigate(
+                    Screens.AddNewReminder
+                )
+                viewModel.resetNavState()
             }
         }
     }
