@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "959632920023",
+    "project_id": "advanced-reminder-31c22",
+    "storage_bucket": "advanced-reminder-31c22.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959632920023:android:942c865335f5633dd2cf92",
+        "android_client_info": {
+          "package_name": "com.pfv.advancedreminder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKLENOlvLOCHhJHd2jo019-iJOZ8WiuoQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

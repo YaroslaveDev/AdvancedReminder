@@ -1,5 +1,6 @@
 package com.pfv.advancedreminder.ui.screens.add_new_reminder.event
 
+import android.content.Context
 import com.pfv.advancedreminder.constants.DaysOfWeek
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType
 import java.util.Date
@@ -19,5 +20,5 @@ sealed class AddNewReminderEvent {
     data class UpdateSelectableDayOfWeekToRemind(val day: DaysOfWeek) : AddNewReminderEvent()
     data class UpdateTitle(val text: String) : AddNewReminderEvent()
     data class UpdateDescription(val text: String) : AddNewReminderEvent()
-    object AddNewReminderClick : AddNewReminderEvent()
+    data class AddNewReminderClick(val context: Context) : AddNewReminderEvent()
 }

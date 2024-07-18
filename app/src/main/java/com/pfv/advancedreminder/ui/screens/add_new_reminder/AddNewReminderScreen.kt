@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -52,6 +53,7 @@ import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.Selectabl
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.SetDateComponent
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.SetReminderTimeComponent
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.event.AddNewReminderEvent
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.nav_state.AddNewReminderNavState
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.ui_state.AddNewReminderUiState
 import java.util.Calendar
 
@@ -69,6 +71,8 @@ fun AddNewReminderScreen(
     val reminderState by viewModel.selectedReminderType.collectAsState()
     val form by viewModel.form.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
+    val navState by viewModel.navState.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier
@@ -212,7 +216,7 @@ fun AddNewReminderScreen(
                     .fillMaxWidth()
                     .padding(top = 20.dp, start = 20.dp, end = 20.dp),
                 onClick = {
-                    viewModel.reduceEvent(AddNewReminderEvent.AddNewReminderClick)
+                    viewModel.reduceEvent(AddNewReminderEvent.AddNewReminderClick(context = context))
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
@@ -298,6 +302,16 @@ fun AddNewReminderScreen(
                     viewModel.resetUiState()
                 }
             )
+        }
+    }
+
+    LaunchedEffect(navState){
+
+        when(navState){
+            AddNewReminderNavState.InitState -> {}
+            AddNewReminderNavState.NavigateBack -> {
+                navController.navigateUp()
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.pfv.advancedreminder.permissions.requestNotificationPermission
 import com.pfv.advancedreminder.ui.navigation.MainNavGraph
 import com.pfv.advancedreminder.ui.theme.AdvancedReminderTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val navController = rememberNavController()
+            requestNotificationPermission()
 
             AdvancedReminderTheme(
                 dynamicColor = false

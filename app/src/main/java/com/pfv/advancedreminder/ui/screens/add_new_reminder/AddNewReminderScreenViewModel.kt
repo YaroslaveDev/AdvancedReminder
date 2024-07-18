@@ -1,5 +1,6 @@
 package com.pfv.advancedreminder.ui.screens.add_new_reminder
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,15 +8,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pfv.advancedreminder.R
 import com.pfv.advancedreminder.constants.DaysOfWeek
+import com.pfv.advancedreminder.tools.scheduleNotification
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.event.AddNewReminderEvent
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.form.AddNewReminderScreenForm
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.nav_state.AddNewReminderNavState
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.ui_state.AddNewReminderUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -30,6 +34,10 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
     private var _uiState: MutableStateFlow<AddNewReminderUiState> =
         MutableStateFlow(AddNewReminderUiState.InitState)
     var uiState: StateFlow<AddNewReminderUiState> = _uiState.asStateFlow()
+
+    private var _navState: MutableStateFlow<AddNewReminderNavState> =
+        MutableStateFlow(AddNewReminderNavState.InitState)
+    var navState: StateFlow<AddNewReminderNavState> = _navState.asStateFlow()
 
     private var isTitleRealtimeValidationActive by mutableStateOf(false)
     private var isSelectTimeToRemindRealtimeValidationActive by mutableStateOf(false)
@@ -57,11 +65,11 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
 
             is AddNewReminderEvent.UpdateDescription -> updateDescription(event.text)
             is AddNewReminderEvent.UpdateTitle -> updateTitle(event.text)
-            AddNewReminderEvent.AddNewReminderClick -> handleAddNewReminderClick()
+            is AddNewReminderEvent.AddNewReminderClick -> handleAddNewReminderClick(event.context)
         }
     }
 
-    private fun handleAddNewReminderClick() {
+    private fun handleAddNewReminderClick(context: Context) {
 
         isTitleRealtimeValidationActive = true
         isSelectTimeToRemindRealtimeValidationActive = true
@@ -69,7 +77,44 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
         validateFields()
 
         if (_form.value.isAllFieldsValid()) {
+            processAddNewSimpleReminders(context)
+        }
+    }
 
+    private fun processAddNewSimpleReminders(
+        context: Context
+    ){
+
+        val calendar = Calendar.getInstance()
+
+        val startDate = _form.value.startDate ?: calendar.time
+        val endDate = _form.value.endDate ?: startDate
+
+        var currentDate = startDate
+        while (currentDate <= endDate) {
+
+            val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+            if (_form.value.selectableDaysOfWeekToRemind.map { it.day }.contains(dayOfWeek)) {
+
+                _form.value.time.forEach { time ->
+
+                    calendar.time = currentDate
+                    calendar.set(Calendar.HOUR_OF_DAY, time.hours)
+                    calendar.set(Calendar.MINUTE, time.minutes)
+                    calendar.set(Calendar.SECOND, 0)
+
+                    val delayMinutes = (calendar.timeInMillis - System.currentTimeMillis()) / 60000
+
+                    scheduleNotification(context, delayMinutes, _form.value.title, _form.value.description)
+                }
+            }
+
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+            currentDate = calendar.time
+        }
+
+        viewModelScope.launch {
+            _navState.emit(AddNewReminderNavState.NavigateBack)
         }
     }
 

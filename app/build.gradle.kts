@@ -25,15 +25,44 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
+            isMinifyEnabled = true
+            isDebuggable = false
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        getByName("debug") {
             isMinifyEnabled = false
+            isDebuggable = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
         }
+
+        flavorDimensions("environment")
+        productFlavors {
+            create("prod") {
+                dimension = "environment"
+            }
+            create("dev") {
+                dimension = "environment"
+                applicationIdSuffix = ".dev"
+                versionNameSuffix = "-dev"
+            }
+            create("stage") {
+                dimension = "environment"
+                applicationIdSuffix = ".stage"
+                versionNameSuffix = "-stage"
+            }
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -56,6 +85,7 @@ android {
 
 dependencies {
 
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     val nav_version = "2.8.0-beta05"
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("androidx.core:core-ktx:1.13.1")

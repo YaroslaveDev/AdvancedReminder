@@ -8,7 +8,7 @@ import java.util.Date
 @Entity(tableName = BaseRemindersTable)
 data class BaseReminderDbo(
     @PrimaryKey(autoGenerate = true)
-    val id: String,
+    val id: Int,
     val timesToRemindPerDay: Int,
     val startDate: Date,
     val endDate: Date,
