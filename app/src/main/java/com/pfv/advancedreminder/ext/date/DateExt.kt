@@ -46,3 +46,31 @@ fun Date.toFormattedString(): String {
     val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     return sdf.format(this)
 }
+
+fun Date.formatDateToTimeString(): String {
+    val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+    return formatter.format(this)
+}
+
+fun Long.longToDate(): Date {
+    return Date(this)
+}
+
+fun Date.toHourMinutePair(): Pair<Int, Int> {
+    val calendar = Calendar.getInstance().apply {
+        time = this@toHourMinutePair
+    }
+    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+    val minute = calendar.get(Calendar.MINUTE)
+    return Pair(hour, minute)
+}
+
+fun isDifferanceMoreThanWeek(start: Long, end: Long) : Boolean {
+
+    val daySec = 86_400
+
+    val diffMillis = end - start
+    val diffSec = diffMillis / 1000
+
+    return (diffSec / daySec) >= 7
+}

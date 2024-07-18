@@ -1,4 +1,21 @@
 <resources>
     <string name="app_name">AdvancedReminder</string>
     <string name="repeat_and_learn">Repeat &amp; Learn</string>
+    <string name="add_new_reminder">Add New Reminder</string>
+    <string name="base">Base</string>
+    <string name="random">Random</string>
+    <string name="times_to_remind">Times to remind</string>
+    <string name="days_to_remind">Days of week to remind (%s)</string>
+    <string name="select_time">Select time to remind</string>
+    <string name="select_date">Select date</string>
+    <string name="ok">OK</string>
+    <string name="cancel">CANCEL</string>
+
+    <string name="monday">Mo</string>
+    <string name="tuesday">Tu</string>
+    <string name="wednesday">We</string>
+    <string name="thursday">Th</string>
+    <string name="friday">Fr</string>
+    <string name="saturday">Sa</string>
+    <string name="sunday">Su</string>
 </resources>

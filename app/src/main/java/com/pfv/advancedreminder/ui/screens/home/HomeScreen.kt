@@ -65,9 +65,9 @@ fun HomeScreen(
         viewModel.dates.size
     }
 
-    LaunchedEffect(currentDate) {
-        currentDate = Calendar.getInstance().time
-    }
+//    LaunchedEffect(currentDate) {
+//        currentDate = Calendar.getInstance().time
+//    }
 
     val lazyState = rememberLazyListState()
 

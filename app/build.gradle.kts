@@ -65,7 +65,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+//    implementation("androidx.compose.material3:material3")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -86,7 +86,8 @@ dependencies {
 
     //Navigation
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("androidx.compose.material3:material3:1.2.1")
+//    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material3:material3:1.3.0-beta04")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     //Hilt
