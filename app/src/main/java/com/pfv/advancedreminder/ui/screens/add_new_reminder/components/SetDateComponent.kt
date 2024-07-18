@@ -26,7 +26,7 @@ import java.util.Date
 @Composable
 fun SetDateComponent(
     modifier: Modifier,
-    date: Pair<Date, Date>,
+    date: Pair<Date?, Date?>,
     onClick: () -> Unit
 ) {
 

@@ -47,6 +47,27 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
             is AddNewReminderEvent.UpdateSelectableDayOfWeekToRemind -> handleUpdateSelectableDayOfWeekToRemindFlow(
                 event.day
             )
+
+            is AddNewReminderEvent.UpdateDescription -> updateDescription(event.text)
+            is AddNewReminderEvent.UpdateTitle -> updateTitle(event.text)
+        }
+    }
+
+    private fun updateTitle(text: String){
+
+        _form.update {
+            it.copy(
+                title = text
+            )
+        }
+    }
+
+    private fun updateDescription(text: String){
+
+        _form.update {
+            it.copy(
+                description = text
+            )
         }
     }
 

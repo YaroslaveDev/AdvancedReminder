@@ -22,7 +22,9 @@ class MainActivity : ComponentActivity() {
 
             val navController = rememberNavController()
 
-            AdvancedReminderTheme {
+            AdvancedReminderTheme(
+                dynamicColor = false
+            ) {
 
                 enableEdgeToEdge()
 

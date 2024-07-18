@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -61,13 +59,13 @@ fun SetReminderTimeComponent(
             contentAlignment = Alignment.Center
         ) {
 
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
 
-                itemsIndexed(time) { index, item ->
+                time.forEachIndexed { index, item ->
 
                     SelectedTimeToRemindItem(
                         canDelete = (index > 0) || (time.size > 1),
@@ -81,29 +79,27 @@ fun SetReminderTimeComponent(
                     )
                 }
 
-                item {
-                    if (needAddNewTime){
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            PulsatingAnimation(
-                                pulsarColor = MaterialTheme.colorScheme.primary,
-                                fab = {
-                                    IconButton(
-                                        modifier = Modifier,
-                                        onClick = onAddNewTime
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_add),
-                                            contentDescription = "img",
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
+                if (needAddNewTime) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        PulsatingAnimation(
+                            pulsarColor = MaterialTheme.colorScheme.primary,
+                            fab = {
+                                IconButton(
+                                    modifier = Modifier,
+                                    onClick = onAddNewTime
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_add),
+                                        contentDescription = "img",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
                                 }
-                            )
-                        }
+                            }
+                        )
                     }
                 }
             }

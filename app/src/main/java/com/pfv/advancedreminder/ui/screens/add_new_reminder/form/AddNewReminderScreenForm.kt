@@ -12,7 +12,10 @@ data class AddNewReminderScreenForm(
     val time: List<Date> = listOf(Calendar.getInstance().time),
     val startDate: Date? = null,
     val endDate: Date? = null,
-    val selectableDaysOfWeekToRemind: List<DaysOfWeek> = DaysOfWeek.entries
+    val selectableDaysOfWeekToRemind: List<DaysOfWeek> = DaysOfWeek.entries,
+    val title: String = "",
+    val description: String = ""
+
 ){
 
     fun formattedTimeList() = time.map {
