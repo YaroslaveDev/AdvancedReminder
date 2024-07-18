@@ -122,4 +122,8 @@ dependencies {
 
     //Vertex AI
     implementation("com.google.firebase:firebase-vertexai:16.0.0-beta01")
+
+    //Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
 }
