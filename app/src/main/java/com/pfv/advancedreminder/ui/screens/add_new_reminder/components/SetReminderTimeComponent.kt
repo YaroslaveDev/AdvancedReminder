@@ -21,9 +21,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pfv.advancedreminder.R
 import com.pfv.advancedreminder.ui.anim.PulsatingAnimation
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.form.AddNewReminderScreenForm
 
 @Composable
 fun SetReminderTimeComponent(
+    form: AddNewReminderScreenForm,
     needAddNewTime: Boolean,
     modifier: Modifier,
     time: List<String>,
@@ -47,61 +49,78 @@ fun SetReminderTimeComponent(
             style = MaterialTheme.typography.bodyLarge
         )
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    shape = RoundedCornerShape(6.dp)
-                )
-                .animateContentSize(),
-            contentAlignment = Alignment.Center
+                .animateContentSize()
         ) {
 
-            Column(
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .border(
+                        width = 1.dp,
+                        color = if (form.hasSelectTimeToRemindError()) MaterialTheme.colorScheme.error else
+                            MaterialTheme.colorScheme.tertiary,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .animateContentSize(),
+                contentAlignment = Alignment.Center
             ) {
 
-                time.forEachIndexed { index, item ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
 
-                    SelectedTimeToRemindItem(
-                        canDelete = (index > 0) || (time.size > 1),
-                        time = item,
-                        onEdit = {
-                            onEditByIndex(index)
-                        },
-                        onDelete = {
-                            onDeleteByIndex(index)
-                        }
-                    )
-                }
+                    time.forEachIndexed { index, item ->
 
-                if (needAddNewTime) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        PulsatingAnimation(
-                            pulsarColor = MaterialTheme.colorScheme.primary,
-                            fab = {
-                                IconButton(
-                                    modifier = Modifier,
-                                    onClick = onAddNewTime
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_add),
-                                        contentDescription = "img",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+                        SelectedTimeToRemindItem(
+                            canDelete = (index > 0) || (time.size > 1),
+                            time = item,
+                            onEdit = {
+                                onEditByIndex(index)
+                            },
+                            onDelete = {
+                                onDeleteByIndex(index)
                             }
                         )
                     }
+
+                    if (needAddNewTime) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            PulsatingAnimation(
+                                pulsarColor = MaterialTheme.colorScheme.primary,
+                                fab = {
+                                    IconButton(
+                                        modifier = Modifier,
+                                        onClick = onAddNewTime
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_add),
+                                            contentDescription = "img",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
+            }
+
+            if (form.hasSelectTimeToRemindError()){
+                Text(
+                    text = stringResource(id = form.selectTimeToRemindError!!, form.countOfAdditionalTimesToRemind()),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }

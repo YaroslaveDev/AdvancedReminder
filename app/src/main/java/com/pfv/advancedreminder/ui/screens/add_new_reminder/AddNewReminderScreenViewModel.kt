@@ -1,7 +1,11 @@
 package com.pfv.advancedreminder.ui.screens.add_new_reminder
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pfv.advancedreminder.R
 import com.pfv.advancedreminder.constants.DaysOfWeek
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.event.AddNewReminderEvent
@@ -27,6 +31,9 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
         MutableStateFlow(AddNewReminderUiState.InitState)
     var uiState: StateFlow<AddNewReminderUiState> = _uiState.asStateFlow()
 
+    private var isTitleRealtimeValidationActive by mutableStateOf(false)
+    private var isSelectTimeToRemindRealtimeValidationActive by mutableStateOf(false)
+
     fun reduceEvent(event: AddNewReminderEvent) {
 
         when (event) {
@@ -50,19 +57,61 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
 
             is AddNewReminderEvent.UpdateDescription -> updateDescription(event.text)
             is AddNewReminderEvent.UpdateTitle -> updateTitle(event.text)
+            AddNewReminderEvent.AddNewReminderClick -> handleAddNewReminderClick()
         }
     }
 
-    private fun updateTitle(text: String){
+    private fun handleAddNewReminderClick() {
+
+        isTitleRealtimeValidationActive = true
+        isSelectTimeToRemindRealtimeValidationActive = true
+
+        validateFields()
+
+        if (_form.value.isAllFieldsValid()) {
+
+        }
+    }
+
+    private fun validateFields() {
+        validateSelectTimeToRemind()
+        validateTitle()
+    }
+
+    private fun validateSelectTimeToRemind() {
+
+        _form.update {
+            it.copy(
+                selectTimeToRemindError = if ((_form.value.timesToRemind > _form.value.time.size) && isSelectTimeToRemindRealtimeValidationActive)
+                    R.string.select_more_times_to_remind
+                else null
+            )
+        }
+    }
+
+    private fun validateTitle() {
+
+        _form.update {
+            it.copy(
+                titleError = if (_form.value.title.isBlank() && isTitleRealtimeValidationActive)
+                    R.string.this_field_is_required
+                else null
+            )
+        }
+    }
+
+    private fun updateTitle(text: String) {
 
         _form.update {
             it.copy(
                 title = text
             )
         }
+
+        validateTitle()
     }
 
-    private fun updateDescription(text: String){
+    private fun updateDescription(text: String) {
 
         _form.update {
             it.copy(
@@ -145,6 +194,8 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
                 time = it.time + date
             )
         }
+
+        validateSelectTimeToRemind()
     }
 
     private fun removeTimeByIndex(index: Int) {
@@ -158,6 +209,8 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
                 time = updatedTime
             )
         }
+
+        validateSelectTimeToRemind()
     }
 
     private fun incrementTimesToRemind() {
@@ -166,6 +219,8 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
                 timesToRemind = it.timesToRemind.plus(1)
             )
         }
+
+        validateSelectTimeToRemind()
     }
 
     private fun decrementTimesToRemind() {
@@ -184,10 +239,10 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
                 timesToRemind = it.timesToRemind.minus(1)
             )
         }
-
+        validateSelectTimeToRemind()
     }
 
-    fun resetSelectableDaysOfWeekToRemind(){
+    fun resetSelectableDaysOfWeekToRemind() {
         _form.update {
             it.copy(
                 selectableDaysOfWeekToRemind = DaysOfWeek.entries

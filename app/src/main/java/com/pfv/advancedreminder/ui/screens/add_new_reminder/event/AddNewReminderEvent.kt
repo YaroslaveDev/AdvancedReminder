@@ -19,4 +19,5 @@ sealed class AddNewReminderEvent {
     data class UpdateSelectableDayOfWeekToRemind(val day: DaysOfWeek) : AddNewReminderEvent()
     data class UpdateTitle(val text: String) : AddNewReminderEvent()
     data class UpdateDescription(val text: String) : AddNewReminderEvent()
+    object AddNewReminderClick : AddNewReminderEvent()
 }

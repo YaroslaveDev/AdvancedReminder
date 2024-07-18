@@ -42,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.pfv.advancedreminder.R
 import com.pfv.advancedreminder.ext.date.toHourMinutePair
+import com.pfv.advancedreminder.tools.clearKeyboardAndFocusOfField
 import com.pfv.advancedreminder.ui.common.BaseAppDatePicker
 import com.pfv.advancedreminder.ui.common.BaseAppTimePicker
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.ChangeReminderTypeSection
@@ -186,7 +187,8 @@ fun AddNewReminderScreen(
                 },
                 onAddNewTime = {
                     viewModel.reduceEvent(AddNewReminderEvent.ShowTimePicker_AddTime)
-                }
+                },
+                form = form
             )
 
             InputTitleDescriptionSection(
@@ -195,15 +197,14 @@ fun AddNewReminderScreen(
                 keyboardController = keyboardController,
                 modifier = Modifier
                     .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-                title = form.title,
-                description = form.description,
                 onTitleChanged = {
                     viewModel.reduceEvent(AddNewReminderEvent.UpdateTitle(it))
                 },
                 onDescriptionChanged = {
                     viewModel.reduceEvent(AddNewReminderEvent.UpdateDescription(it))
                 },
-                focusManager = focusManager
+                focusManager = focusManager,
+                form = form
             )
 
             Button(
@@ -211,7 +212,7 @@ fun AddNewReminderScreen(
                     .fillMaxWidth()
                     .padding(top = 20.dp, start = 20.dp, end = 20.dp),
                 onClick = {
-
+                    viewModel.reduceEvent(AddNewReminderEvent.AddNewReminderClick)
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
@@ -243,6 +244,7 @@ fun AddNewReminderScreen(
         AddNewReminderUiState.AddNewTime -> {
 
             val pairOfHourAndMinute = Calendar.getInstance().time.toHourMinutePair()
+            clearKeyboardAndFocusOfField(keyboardController, focusManager)
 
             BaseAppTimePicker(
                 onConfirm = {
@@ -262,6 +264,7 @@ fun AddNewReminderScreen(
         is AddNewReminderUiState.EditTimeByIndex -> {
 
             val pairOfHourAndMinute = state.time.toHourMinutePair()
+            clearKeyboardAndFocusOfField(keyboardController, focusManager)
 
             BaseAppTimePicker(
                 onConfirm = {
@@ -280,6 +283,8 @@ fun AddNewReminderScreen(
 
         AddNewReminderUiState.InitState -> {}
         AddNewReminderUiState.AddNewDate -> {
+
+            clearKeyboardAndFocusOfField(keyboardController, focusManager)
 
             BaseAppDatePicker(
                 startDate = form.startDate,

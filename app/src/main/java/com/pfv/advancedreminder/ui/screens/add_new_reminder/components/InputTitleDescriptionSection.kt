@@ -1,5 +1,6 @@
 package com.pfv.advancedreminder.ui.screens.add_new_reminder.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,19 +21,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.pfv.advancedreminder.R
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.form.AddNewReminderScreenForm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InputTitleDescriptionSection(
+    form: AddNewReminderScreenForm,
     focusManager: FocusManager,
     coroutineScope: CoroutineScope,
     bringIntoViewRequester: BringIntoViewRequester,
     keyboardController: SoftwareKeyboardController?,
     modifier: Modifier,
-    title: String,
-    description: String,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit
 ) {
@@ -49,33 +50,48 @@ fun InputTitleDescriptionSection(
             style = MaterialTheme.typography.bodyLarge
         )
 
-        OutlinedTextField(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .onFocusEvent { focusState ->
-                    if (focusState.isFocused) {
-                        coroutineScope.launch {
-                            bringIntoViewRequester.bringIntoView()
-                        }
-                    }
-                },
-            value = title,
-            onValueChange = onTitleChanged,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
-                disabledIndicatorColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
-                disabledContainerColor = MaterialTheme.colorScheme.surface,
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-            ),
-            maxLines = 2,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
-        )
+                .animateContentSize()
+        ) {
 
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusEvent { focusState ->
+                        if (focusState.isFocused) {
+                            coroutineScope.launch {
+                                bringIntoViewRequester.bringIntoView()
+                            }
+                        }
+                    },
+                value = form.title,
+                onValueChange = onTitleChanged,
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                    disabledIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    errorContainerColor = MaterialTheme.colorScheme.surface
+                ),
+                maxLines = 2,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                isError = form.hasTitleError(),
+            )
+
+            if (form.hasTitleError()) {
+                Text(
+                    text = stringResource(id = form.titleError!!),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
         Text(
             modifier = Modifier,
             text = stringResource(id = R.string.description),
@@ -93,12 +109,12 @@ fun InputTitleDescriptionSection(
                         }
                     }
                 },
-            value = description,
+            value = form.description,
             onValueChange = onDescriptionChanged,
             colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
-                disabledIndicatorColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
+                focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                disabledIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
                 disabledContainerColor = MaterialTheme.colorScheme.surface,
                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                 focusedTextColor = MaterialTheme.colorScheme.onSurface,
