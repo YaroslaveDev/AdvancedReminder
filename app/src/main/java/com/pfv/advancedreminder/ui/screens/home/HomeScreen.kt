@@ -23,7 +23,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -49,7 +48,7 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
 
-    var currentDate by remember {
+    val currentDate by remember {
         mutableStateOf(Calendar.getInstance().time)
     }
     val initialPageIndex by remember {
@@ -64,10 +63,6 @@ fun HomeScreen(
     ) {
         viewModel.dates.size
     }
-
-//    LaunchedEffect(currentDate) {
-//        currentDate = Calendar.getInstance().time
-//    }
 
     val lazyState = rememberLazyListState()
 
@@ -191,7 +186,7 @@ fun HomeScreen(
             HomeScreenNavState.InitState -> {}
             HomeScreenNavState.NavToAddNewReminderScreen -> {
                 navController.navigate(
-                    Screens.AddNewReminder
+                    Screens.MainNavGraph
                 )
                 viewModel.resetNavState()
             }

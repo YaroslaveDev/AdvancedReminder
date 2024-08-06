@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pfv.advancedreminder.R
-import com.pfv.advancedreminder.ui.navigation.routes.Screens
+import com.pfv.advancedreminder.ui.navigation.routes.SubGraph
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -29,7 +29,7 @@ fun SplashScreen(
     LaunchedEffect(Unit){
 
         delay(2000)
-        navController.navigate(Screens.Home){
+        navController.navigate(SubGraph.Main){
             popUpTo(0)
         }
     }

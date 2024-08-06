@@ -10,7 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.pfv.advancedreminder.permissions.requestNotificationPermission
-import com.pfv.advancedreminder.ui.navigation.MainNavGraph
+import com.pfv.advancedreminder.ui.navigation.RootNavGraph
 import com.pfv.advancedreminder.ui.theme.AdvancedReminderTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surface
                 ) {
-                    MainNavGraph(
+                    RootNavGraph(
                         navController = navController
                     )
                 }
