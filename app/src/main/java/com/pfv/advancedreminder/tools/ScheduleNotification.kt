@@ -1,6 +1,7 @@
 package com.pfv.advancedreminder.tools
 
 import android.content.Context
+import android.util.Log
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -10,6 +11,8 @@ import com.pfv.advancedreminder.worker.NotificationWorker
 import java.util.concurrent.TimeUnit
 
 fun scheduleNotification(context: Context, delayMinutes: Long, title: String, message: String) {
+
+    Log.i("ScheduleReminder", "Scheduled notification with title: $title, description: $message, delay: $delayMinutes minutes")
 
     val inputData = Data.Builder()
         .putString(NOTIFICATION_TITLE_PARAM, title)
