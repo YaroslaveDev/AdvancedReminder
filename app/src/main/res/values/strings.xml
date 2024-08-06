@@ -7,6 +7,7 @@
     <string name="times_to_remind">Times to remind per day</string>
     <string name="days_to_remind">Days of week to remind (%s)</string>
     <string name="select_time">Select time to remind</string>
+    <string name="select_time_range">Select time range to remind</string>
     <string name="select_date">Select date</string>
     <string name="title">Title</string>
     <string name="description">Description (Optional)</string>
@@ -24,4 +25,10 @@
     <string name="select_times_to_remind_error">You must add time count equals to remind per day</string>
     <string name="select_at_least_one_day_of_week">You must select at least one day of week</string>
     <string name="select_more_times_to_remind">Add (%s) more time to remind or decrease times to remind per day</string>
+
+    <string name="start">Start</string>
+    <string name="end">End</string>
+
+    <string name="start_time_larger_of_end_time">Start time must be less of end time !</string>
+    <string name="both_times_equals">Must be at least 1 minute difference !</string>
 </resources>

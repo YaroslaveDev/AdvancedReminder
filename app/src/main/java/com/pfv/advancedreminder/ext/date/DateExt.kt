@@ -74,3 +74,11 @@ fun isDifferanceMoreThanWeek(start: Long, end: Long) : Boolean {
 
     return (diffSec / daySec) >= 7
 }
+
+fun Calendar.setHourAndMinute(hour: Int, minute: Int) {
+    set(Calendar.HOUR_OF_DAY, hour)
+    set(Calendar.MINUTE, minute)
+}
+
+fun Date.isLargerThan(endTime: Date) = this.time > endTime.time
+fun Date.isEquals(endTime: Date) = this.toHourMinutePair() == endTime.toHourMinutePair()

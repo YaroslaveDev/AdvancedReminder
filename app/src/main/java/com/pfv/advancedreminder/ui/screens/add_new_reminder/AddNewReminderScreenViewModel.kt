@@ -8,8 +8,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pfv.advancedreminder.R
 import com.pfv.advancedreminder.constants.DaysOfWeek
+import com.pfv.advancedreminder.constants.TimeType
+import com.pfv.advancedreminder.constants.TimeType.END
+import com.pfv.advancedreminder.constants.TimeType.START
+import com.pfv.advancedreminder.ext.date.isEquals
+import com.pfv.advancedreminder.ext.date.isLargerThan
 import com.pfv.advancedreminder.tools.scheduleNotification
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType.BASE
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType.RANDOM
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.event.AddNewReminderEvent
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.form.AddNewReminderScreenForm
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.nav_state.AddNewReminderNavState
@@ -25,7 +32,7 @@ import javax.inject.Inject
 
 class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
 
-    private var _selectedReminderType = MutableStateFlow(ReminderType.BASE)
+    private var _selectedReminderType = MutableStateFlow(BASE)
     var selectedReminderType: StateFlow<ReminderType> = _selectedReminderType.asStateFlow()
 
     private var _form = MutableStateFlow(AddNewReminderScreenForm())
@@ -66,7 +73,24 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
             is AddNewReminderEvent.UpdateDescription -> updateDescription(event.text)
             is AddNewReminderEvent.UpdateTitle -> updateTitle(event.text)
             is AddNewReminderEvent.AddNewReminderClick -> handleAddNewReminderClick(event.context)
+            is AddNewReminderEvent.ShowPopupSetNewStartEndTime -> updateUiState(
+                AddNewReminderUiState.SetNewStartEndTime(event.type)
+            )
+
+            is AddNewReminderEvent.SetNewStartEndTime -> updateStartEndTime(event.date, event.type)
         }
+    }
+
+    private fun updateStartEndTime(date: Date, type: TimeType) {
+
+        _form.update {
+            when (type) {
+                START -> it.copy(startTimeToRemind = date)
+                END -> it.copy(endTimeToRemind = date)
+            }
+        }
+
+        validateStartEndTime()
     }
 
     private fun handleAddNewReminderClick(context: Context) {
@@ -83,7 +107,7 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
 
     private fun processAddNewSimpleReminders(
         context: Context
-    ){
+    ) {
 
         val calendar = Calendar.getInstance()
 
@@ -105,7 +129,12 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
 
                     val delayMinutes = (calendar.timeInMillis - System.currentTimeMillis()) / 60000
 
-                    scheduleNotification(context, delayMinutes, _form.value.title, _form.value.description)
+                    scheduleNotification(
+                        context,
+                        delayMinutes,
+                        _form.value.title,
+                        _form.value.description
+                    )
                 }
             }
 
@@ -119,8 +148,13 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun validateFields() {
-        validateSelectTimeToRemind()
+
         validateTitle()
+
+        when(selectedReminderType.value){
+            BASE -> validateSelectTimeToRemind()
+            RANDOM -> validateStartEndTime()
+        }
     }
 
     private fun validateSelectTimeToRemind() {
@@ -129,6 +163,19 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
             it.copy(
                 selectTimeToRemindError = if ((_form.value.timesToRemind > _form.value.time.size) && isSelectTimeToRemindRealtimeValidationActive)
                     R.string.select_more_times_to_remind
+                else null
+            )
+        }
+    }
+
+    private fun validateStartEndTime() {
+
+        _form.update {
+            it.copy(
+                startEndTimeError = if (
+                    form.value.startTimeToRemind.isLargerThan(form.value.endTimeToRemind)
+                ) R.string.start_time_larger_of_end_time
+                else if (form.value.startTimeToRemind.isEquals(form.value.endTimeToRemind)) R.string.both_times_equals
                 else null
             )
         }
@@ -292,6 +339,12 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
             it.copy(
                 selectableDaysOfWeekToRemind = DaysOfWeek.entries
             )
+        }
+    }
+
+    fun updateUiState(state: AddNewReminderUiState) {
+        viewModelScope.launch {
+            _uiState.emit(state)
         }
     }
 

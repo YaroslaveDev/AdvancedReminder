@@ -1,5 +1,6 @@
 package com.pfv.advancedreminder.ui.screens.add_new_reminder
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -42,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.pfv.advancedreminder.R
+import com.pfv.advancedreminder.constants.TimeType.END
+import com.pfv.advancedreminder.constants.TimeType.START
 import com.pfv.advancedreminder.ext.date.toHourMinutePair
 import com.pfv.advancedreminder.tools.clearKeyboardAndFocusOfField
 import com.pfv.advancedreminder.ui.common.BaseAppDatePicker
@@ -49,9 +52,12 @@ import com.pfv.advancedreminder.ui.common.BaseAppTimePicker
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.ChangeReminderTypeSection
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.CountOfRemindingsComponent
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.InputTitleDescriptionSection
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.SelectSimpleTimeComponent
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.SelectableDaysToRemindSection
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.SetDateComponent
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.components.SetReminderTimeComponent
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType.BASE
+import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType.RANDOM
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.event.AddNewReminderEvent
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.nav_state.AddNewReminderNavState
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.ui_state.AddNewReminderUiState
@@ -158,42 +164,63 @@ fun AddNewReminderScreen(
                 }
             )
 
-            if (form.needDisplaySelectSpecifiedDaysSection()){
+            if (form.needDisplaySelectSpecifiedDaysSection()) {
                 SelectableDaysToRemindSection(
                     modifier = Modifier
                         .padding(top = 20.dp, start = 20.dp, end = 20.dp),
                     selectedItems = form.selectableDaysOfWeekToRemind,
                     onItemSelect = {
-                        viewModel.reduceEvent(AddNewReminderEvent.UpdateSelectableDayOfWeekToRemind(it))
+                        viewModel.reduceEvent(
+                            AddNewReminderEvent.UpdateSelectableDayOfWeekToRemind(
+                                it
+                            )
+                        )
                     }
                 )
-            }else{
-                LaunchedEffect(Unit){
+            } else {
+                LaunchedEffect(Unit) {
                     viewModel.resetSelectableDaysOfWeekToRemind()
                 }
             }
 
-            SetReminderTimeComponent(
-                needAddNewTime = (form.timesToRemind > 1) && (form.timesToRemind > form.time.size),
-                modifier = Modifier
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-                time = form.formattedTimeList(),
-                onEditByIndex = {
-                    viewModel.reduceEvent(
-                        AddNewReminderEvent.ShowTimePicker_EditTime(
-                            it,
-                            form.getTimeByIndex(it)
+
+            AnimatedContent(targetState = reminderState, label = "") {
+                when(it){
+                    BASE -> {
+                        SetReminderTimeComponent(
+                            needAddNewTime = (form.timesToRemind > 1) && (form.timesToRemind > form.time.size),
+                            modifier = Modifier
+                                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                            time = form.formattedTimeList(),
+                            onEditByIndex = {
+                                viewModel.reduceEvent(
+                                    AddNewReminderEvent.ShowTimePicker_EditTime(
+                                        it,
+                                        form.getTimeByIndex(it)
+                                    )
+                                )
+                            },
+                            onDeleteByIndex = {
+                                viewModel.reduceEvent(AddNewReminderEvent.RemoveTimeByIndex(it))
+                            },
+                            onAddNewTime = {
+                                viewModel.reduceEvent(AddNewReminderEvent.ShowTimePicker_AddTime)
+                            },
+                            form = form
                         )
-                    )
-                },
-                onDeleteByIndex = {
-                    viewModel.reduceEvent(AddNewReminderEvent.RemoveTimeByIndex(it))
-                },
-                onAddNewTime = {
-                    viewModel.reduceEvent(AddNewReminderEvent.ShowTimePicker_AddTime)
-                },
-                form = form
-            )
+                    }
+                    RANDOM -> {
+                        SelectSimpleTimeComponent(
+                            form = form,
+                            modifier = Modifier
+                                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                            setNewTime = {
+                                viewModel.reduceEvent(AddNewReminderEvent.ShowPopupSetNewStartEndTime(it))
+                            }
+                        )
+                    }
+                }
+            }
 
             InputTitleDescriptionSection(
                 coroutineScope = coroutineScope,
@@ -303,11 +330,35 @@ fun AddNewReminderScreen(
                 }
             )
         }
+
+        is AddNewReminderUiState.SetNewStartEndTime -> {
+
+            clearKeyboardAndFocusOfField(keyboardController, focusManager)
+
+            val pairOfHourAndMinute = when(state.type){
+                START -> form.startTimeToRemind.toHourMinutePair()
+                END -> form.endTimeToRemind.toHourMinutePair()
+            }
+
+            BaseAppTimePicker(
+                onConfirm = {
+                    viewModel.reduceEvent(
+                        AddNewReminderEvent.SetNewStartEndTime(state.type, it)
+                    )
+                    viewModel.resetUiState()
+                },
+                onDismiss = {
+                    viewModel.resetUiState()
+                },
+                hour = pairOfHourAndMinute.first,
+                minute = pairOfHourAndMinute.second
+            )
+        }
     }
 
-    LaunchedEffect(navState){
+    LaunchedEffect(navState) {
 
-        when(navState){
+        when (navState) {
             AddNewReminderNavState.InitState -> {}
             AddNewReminderNavState.NavigateBack -> {
                 navController.navigateUp()
