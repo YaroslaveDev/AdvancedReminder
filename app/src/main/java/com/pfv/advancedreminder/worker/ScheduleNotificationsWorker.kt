@@ -9,6 +9,10 @@ import androidx.work.WorkerParameters
 import com.pfv.advancedreminder.R
 import com.pfv.advancedreminder.constants.GlobalAppConstants.NOTIFICATION_MESSAGE_PARAM
 import com.pfv.advancedreminder.constants.GlobalAppConstants.NOTIFICATION_TITLE_PARAM
+import com.pfv.advancedreminder.constants.NotificationConstants.CHANNEL_ID
+import com.pfv.advancedreminder.constants.NotificationConstants.CHANNEL_NAME
+import com.pfv.advancedreminder.constants.NotificationConstants.GROUP_KEY_BASE_REMINDERS
+import com.pfv.advancedreminder.constants.NotificationConstants.SUMMARY_NOTIFICATION_ID
 import kotlin.random.Random
 
 class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
@@ -57,10 +61,4 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         notificationManager.notify(SUMMARY_NOTIFICATION_ID, summaryNotification)
     }
 
-    companion object {
-        private const val CHANNEL_ID = "notification_channel"
-        private const val CHANNEL_NAME = "Notification Channel"
-        private const val GROUP_KEY_BASE_REMINDERS = "base_reminders"
-        private const val SUMMARY_NOTIFICATION_ID = 0
-    }
 }

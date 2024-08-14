@@ -31,4 +31,7 @@
 
     <string name="start_time_larger_of_end_time">Start time must be less of end time !</string>
     <string name="both_times_equals">Must be at least 1 minute difference !</string>
+
+    <string name="base_reminder">Base Reminder</string>
+    <string name="random_reminder">Random Reminder</string>
 </resources>

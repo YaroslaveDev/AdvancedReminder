@@ -14,7 +14,8 @@ import com.pfv.advancedreminder.constants.TimeType.END
 import com.pfv.advancedreminder.constants.TimeType.START
 import com.pfv.advancedreminder.ext.date.isEquals
 import com.pfv.advancedreminder.ext.date.isLargerThan
-import com.pfv.advancedreminder.tools.scheduleNotification
+import com.pfv.advancedreminder.ext.str.addCounter
+import com.pfv.advancedreminder.tools.ScheduleReminderManager
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType.BASE
 import com.pfv.advancedreminder.ui.screens.add_new_reminder.constants.ReminderType.RANDOM
@@ -50,6 +51,8 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
 
     private var isTitleRealtimeValidationActive by mutableStateOf(false)
     private var isSelectTimeToRemindRealtimeValidationActive by mutableStateOf(false)
+
+    private val scheduleReminderManager = ScheduleReminderManager()
 
     fun reduceEvent(event: AddNewReminderEvent) {
 
@@ -126,20 +129,18 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
             val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
             if (_form.value.selectableDaysOfWeekToRemind.map { it.day }.contains(dayOfWeek)) {
 
-                _form.value.time.forEach { time ->
+                _form.value.time.forEachIndexed { index, time ->
 
                     calendar.time = currentDate
                     calendar.set(Calendar.HOUR_OF_DAY, time.hours)
                     calendar.set(Calendar.MINUTE, time.minutes)
                     calendar.set(Calendar.SECOND, 0)
 
-                    val delayMinutes = (calendar.timeInMillis - System.currentTimeMillis()) / 60000
-
-                    scheduleNotification(
-                        context,
-                        delayMinutes,
-                        _form.value.title,
-                        _form.value.description
+                    scheduleReminderManager.scheduleNotification(
+                        context = context,
+                        date = calendar.time,
+                        title = _form.value.title.addCounter(current = index + 1, total = _form.value.timesToRemind),
+                        description = _form.value.description
                     )
                 }
             }
@@ -168,20 +169,18 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
             val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
             if (_form.value.selectableDaysOfWeekToRemind.map { it.day }.contains(dayOfWeek)) {
 
-                generateRandomTimesInInterval(_form.value.startTimeToRemind, _form.value.endTimeToRemind, _form.value.timesToRemind).forEach { time ->
+                generateRandomTimesInInterval(_form.value.startTimeToRemind, _form.value.endTimeToRemind, _form.value.timesToRemind).forEachIndexed { index, time ->
 
                     calendar.time = currentDate
                     calendar.set(Calendar.HOUR_OF_DAY, time.hours)
                     calendar.set(Calendar.MINUTE, time.minutes)
-                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.SECOND, time.seconds)
 
-                    val delayMinutes = (calendar.timeInMillis - System.currentTimeMillis()) / 60000
-
-                    scheduleNotification(
-                        context,
-                        delayMinutes,
-                        _form.value.title,
-                        _form.value.description
+                    scheduleReminderManager.scheduleNotification(
+                        context = context,
+                        date = calendar.time,
+                        title = _form.value.title.addCounter(current = index + 1, total = _form.value.timesToRemind),
+                        description = _form.value.description
                     )
                 }
             }
@@ -203,54 +202,9 @@ class AddNewReminderScreenViewModel @Inject constructor() : ViewModel() {
         for (i in 0 until count) {
             val randomTimeInMillis = Random.nextLong(startTime, endTime)
             randomTimes.add(Date(randomTimeInMillis))
-            Log.i("RandomTime", "Generated random time: ${Date(randomTimeInMillis)} ($randomTimeInMillis)")
         }
 
-        return randomTimes
-    }
-
-    private fun processAddNewRandomReminders(context: Context) {
-        val calendar = Calendar.getInstance()
-
-        val startDate = _form.value.startDate ?: calendar.time
-        val endDate = _form.value.endDate ?: startDate
-        val timesToRemind = _form.value.timesToRemind
-        val randomTimes = generateRandomTimesInInterval(
-            _form.value.startTimeToRemind,
-            _form.value.endTimeToRemind,
-            timesToRemind
-        )
-
-        var currentDate = startDate
-        while (currentDate <= endDate) {
-            val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-            if (_form.value.selectableDaysOfWeekToRemind.map { it.day }.contains(dayOfWeek)) {
-                randomTimes.forEach { time ->
-                    calendar.time = currentDate
-                    val timeCalendar = Calendar.getInstance().apply { setTime(time) }
-                    calendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY))
-                    calendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE))
-                    calendar.set(Calendar.SECOND, 0)
-
-                    val delayMinutes = (calendar.timeInMillis - System.currentTimeMillis()) / 60000
-
-                    Log.i("ScheduleReminder", "Scheduling reminder for: ${calendar.time} in $delayMinutes minutes (delayMillis: ${delayMinutes*60*1000})")
-
-                    scheduleNotification(
-                        context,
-                        delayMinutes,
-                        _form.value.title,
-                        _form.value.description
-                    )
-                }
-            }
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
-            currentDate = calendar.time
-        }
-
-        viewModelScope.launch {
-            _navState.emit(AddNewReminderNavState.NavigateBack)
-        }
+        return randomTimes.sortedBy { it.time }
     }
 
     private fun validateFields() {
