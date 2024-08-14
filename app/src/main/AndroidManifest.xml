@@ -23,7 +23,7 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.AdvancedReminder"
-            android:windowSoftInputMode="adjustResize|adjustPan">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

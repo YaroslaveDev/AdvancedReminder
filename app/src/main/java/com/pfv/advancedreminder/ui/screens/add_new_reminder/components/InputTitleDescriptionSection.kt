@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +59,7 @@ fun InputTitleDescriptionSection(
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .bringIntoViewRequester(bringIntoViewRequester)
                     .onFocusEvent { focusState ->
                         if (focusState.isFocused) {
                             coroutineScope.launch {
@@ -102,6 +104,7 @@ fun InputTitleDescriptionSection(
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
+                .bringIntoViewRequester(bringIntoViewRequester)
                 .onFocusEvent { focusState ->
                     if (focusState.isFocused) {
                         coroutineScope.launch {

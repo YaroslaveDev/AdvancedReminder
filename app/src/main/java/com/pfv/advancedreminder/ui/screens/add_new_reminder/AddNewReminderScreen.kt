@@ -115,13 +115,10 @@ fun AddNewReminderScreen(
                 )
             )
         }
-    ) {
+    ) { it ->
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .imePadding()
-                .verticalScroll(rememberScrollState())
                 .clickable(
                     interactionSource = remember {
                         MutableInteractionSource()
@@ -131,6 +128,9 @@ fun AddNewReminderScreen(
                     focusManager.clearFocus()
                     keyboardController?.hide()
                 }
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .imePadding()
         ) {
             ChangeReminderTypeSection(
                 modifier = Modifier
@@ -264,6 +264,7 @@ fun AddNewReminderScreen(
 
             Spacer(
                 modifier = Modifier
+                    .padding(bottom = it.calculateBottomPadding())
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .height(30.dp)
